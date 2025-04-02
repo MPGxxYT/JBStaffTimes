@@ -1,0 +1,15 @@
+# The amount of weeks to save data. Default is 3.
+savingLength: 3
+
+# Amount of minutes of inactivity before a player is deemed afk
+afkThreshold: 2
+
+# The minimum amount of hours needed a
+# staff member needs to have to "pass"
+minimumHours: 10
+
+# The permission every staff member will have.
+staffPermission: group.helper
+
+# The permission every ADMIN will have, but not regular staff members.
+adminPermission: group.admin
