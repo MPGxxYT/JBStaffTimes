@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @CommandAlias("stafftimes")
-@CommandPermission("group.admin")
+@CommandPermission("jbstafftimes.admin")
 public class StaffTimesCommand extends BaseCommand {
 
   @Default
