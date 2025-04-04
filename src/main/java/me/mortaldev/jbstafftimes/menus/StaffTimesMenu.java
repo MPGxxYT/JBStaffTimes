@@ -113,7 +113,7 @@ public class StaffTimesMenu extends InventoryGUI {
   }
 
   private String getTimeColoredName(String name, double hours) {
-    return hours >= MainConfig.getInstance().getMinumumHours() ? "&2&l" + name : "&c&l" + name;
+    return hours >= MainConfig.getInstance().getMinimumHours() ? "&2&l" + name : "&c&l" + name;
   }
 
   private LinkedHashSet<StaffTime> sortStaffTimes(Set<StaffTime> staffTimes) {
