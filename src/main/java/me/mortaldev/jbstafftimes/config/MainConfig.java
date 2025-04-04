@@ -9,7 +9,7 @@ public class MainConfig extends AbstractConfig {
 
   private ConfigValue<Integer> savingLength = new ConfigValue<>("savingLength", 3);
   private ConfigValue<Integer> afkThreshold = new ConfigValue<>("afkThreshold", 2);
-  private ConfigValue<Integer> minumumHours = new ConfigValue<>("minumumHours", 10);
+  private ConfigValue<Integer> minimumHours = new ConfigValue<>("minimumHours", 8);
   private ConfigValue<String> staffPermission =
       new ConfigValue<>("staffPermission", "group.helper");
   private ConfigValue<String> adminPermission = new ConfigValue<>("adminPermission", "group.admin");
@@ -39,7 +39,7 @@ public class MainConfig extends AbstractConfig {
   public void loadData() {
     savingLength = getConfigValue(savingLength);
     afkThreshold = getConfigValue(afkThreshold);
-    minumumHours = getConfigValue(minumumHours);
+    minimumHours = getConfigValue(minimumHours);
     staffPermission = getConfigValue(staffPermission);
     adminPermission = getConfigValue(adminPermission);
   }
@@ -79,13 +79,13 @@ public class MainConfig extends AbstractConfig {
   }
 
 
-  public Integer getMinumumHours() {
-    return minumumHours.getValue();
+  public Integer getMinimumHours() {
+    return minimumHours.getValue();
   }
 
-  public void setMinumumHours(Integer minumumHours) {
-    this.minumumHours.setValue(minumumHours);
-    saveValue(this.minumumHours.getId(), minumumHours);
+  public void setMinimumHours(Integer minimumHours) {
+    this.minimumHours.setValue(minimumHours);
+    saveValue(this.minimumHours.getId(), minimumHours);
   }
 
 
