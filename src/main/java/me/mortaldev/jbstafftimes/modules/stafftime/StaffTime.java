@@ -37,7 +37,7 @@ public class StaffTime implements CRUD.Identifiable {
     Filter lastFilter = filter;
     if (player != null) {
       if (player.hasPermission(MainConfig.getInstance().getAdminPermission())) {
-        filter = Filter.ALL;
+        filter = Filter.ADMINS;
       } else if (player.hasPermission(MainConfig.getInstance().getStaffPermission())) {
         filter = Filter.NON_ADMINS;
       }

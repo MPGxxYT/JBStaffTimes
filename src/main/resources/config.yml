@@ -6,7 +6,7 @@ afkThreshold: 2
 
 # The minimum amount of hours needed a
 # staff member needs to have to "pass"
-minimumHours: 10
+minimumHours: 8
 
 # The permission every staff member will have.
 staffPermission: group.helper

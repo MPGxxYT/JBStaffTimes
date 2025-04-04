@@ -3,6 +3,7 @@ package me.mortaldev.jbstafftimes;
 import co.aikar.commands.PaperCommandManager;
 import me.mortaldev.jbstafftimes.commands.StaffTimesCommand;
 import me.mortaldev.jbstafftimes.config.MainConfig;
+import me.mortaldev.jbstafftimes.listeners.ChatListener;
 import me.mortaldev.jbstafftimes.listeners.JoinListener;
 import me.mortaldev.jbstafftimes.listeners.MoveListener;
 import me.mortaldev.jbstafftimes.listeners.QuitListener;
@@ -23,6 +24,7 @@ public final class Main extends JavaPlugin {
   static HashSet<String> dependencies = new HashSet<>();
   static PaperCommandManager commandManager;
   static GUIManager guiManager;
+  static Boolean debugToggle;
 
   public static Main getInstance() {
     return instance;
@@ -40,9 +42,18 @@ public final class Main extends JavaPlugin {
     Bukkit.getLogger().info("[" + Main.getLabel() + "] " + message);
   }
 
+  public static void toggleDebug() {
+    debugToggle = !debugToggle;
+  }
+
+  public static Boolean getDebugToggle() {
+    return debugToggle;
+  }
+
   @Override
   public void onEnable() {
     instance = this;
+    debugToggle = false;
     commandManager = new PaperCommandManager(this);
 
     // DATA FOLDER
@@ -77,6 +88,7 @@ public final class Main extends JavaPlugin {
     getServer().getPluginManager().registerEvents(new JoinListener(), this);
     getServer().getPluginManager().registerEvents(new QuitListener(), this);
     getServer().getPluginManager().registerEvents(new MoveListener(), this);
+    getServer().getPluginManager().registerEvents(new ChatListener(), this);
 
     // COMMANDS
 

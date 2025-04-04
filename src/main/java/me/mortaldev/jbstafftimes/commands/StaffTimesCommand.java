@@ -28,4 +28,10 @@ public class StaffTimesCommand extends BaseCommand {
     sender.sendMessage(response);
     AfkManager.getInstance().init();
   }
+
+  @Subcommand("debug")
+  public void debug(CommandSender sender) {
+    Main.toggleDebug();
+    sender.sendMessage("Debug mode " + Main.getDebugToggle().toString());
+  }
 }

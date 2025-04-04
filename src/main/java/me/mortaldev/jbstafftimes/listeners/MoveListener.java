@@ -32,6 +32,6 @@ public class MoveListener implements Listener {
                         .cancelTask(
                             scheduledTasks.remove("delay." + event.getPlayer().getUniqueId())),
                 20L));
-    AfkManager.getInstance().moved(event.getPlayer());
+    AfkManager.getInstance().resetTimer(event.getPlayer());
   }
 }

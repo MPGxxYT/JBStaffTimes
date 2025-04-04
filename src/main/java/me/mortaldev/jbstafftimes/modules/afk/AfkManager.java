@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 import me.mortaldev.jbstafftimes.Main;
+import me.mortaldev.jbstafftimes.config.MainConfig;
 import me.mortaldev.jbstafftimes.modules.timer.TimerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,7 +23,6 @@ public class AfkManager {
     return Singleton.INSTANCE;
   }
 
-
   public boolean containsRelevantPlayer(UUID uuid) {
     return relevantPlayers.contains(uuid);
   }
@@ -40,6 +40,14 @@ public class AfkManager {
   }
 
   public void init() {
+    Bukkit.getOnlinePlayers()
+        .forEach(
+            player -> {
+              if (player.hasPermission(MainConfig.getInstance().getStaffPermission())) {
+                AfkManager.getInstance().clearRelevantPlayers();
+                AfkManager.getInstance().addRelevantPlayer(player.getUniqueId());
+              }
+            });
     if (scheduledTasks.containsKey("afk")) {
       Bukkit.getScheduler().cancelTask(scheduledTasks.remove("afk"));
     }
@@ -53,6 +61,9 @@ public class AfkManager {
                     TimerManager.getInstance().stopTimer(uuid);
                     afkTimer.stopTimer(uuid);
                     afkPlayers.add(uuid);
+                    if (Main.getDebugToggle()) {
+                      Main.log("AFK: " + uuid);
+                    }
                   }
                 },
                 20,
@@ -63,7 +74,10 @@ public class AfkManager {
     afkPlayers.clear();
   }
 
-  public void moved(Player player) {
+  public void resetTimer(Player player) {
+    if (Main.getDebugToggle()) {
+      Main.log("AFK Reset: " + player.getUniqueId());
+    }
     afkTimer.startTimer(player.getUniqueId());
     if (afkPlayers.contains(player.getUniqueId())) {
       afkPlayers.remove(player.getUniqueId());

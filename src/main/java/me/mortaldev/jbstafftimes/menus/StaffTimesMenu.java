@@ -41,24 +41,36 @@ public class StaffTimesMenu extends InventoryGUI {
   }
 
   private int getInventorySize() {
-    HashSet<StaffTime> newStaffTimes = new HashSet<>();
-    for (StaffTime staffTime : staffTimes) {
-      if (staffTime.getFilter() == pageData.getFilter()) {
-        newStaffTimes.add(staffTime);
-      }
-    }
-    staffTimes = newStaffTimes;
+    staffTimes = filterStaffTimes(staffTimes, pageData.getFilter());
     if (pageData.getSearchQuery() != null) {
       String searchQuery = pageData.getSearchQuery();
-      staffTimes = staffTimes.stream()
-              .filter(staffTime -> {
-                String name = Bukkit.getOfflinePlayer(UUID.fromString(staffTime.getID())).getName();
-                return name != null && name.contains(searchQuery);
-              })
+      staffTimes =
+          staffTimes.stream()
+              .filter(
+                  staffTime -> {
+                    String name =
+                        Bukkit.getOfflinePlayer(UUID.fromString(staffTime.getID())).getName();
+                    return name != null && name.contains(searchQuery);
+                  })
               .collect(Collectors.toCollection(HashSet::new));
     }
     double ceil = Math.ceil((double) staffTimes.size() / 9);
     return Utils.clamp((int) ceil + 1, 3, 6);
+  }
+
+  private HashSet<StaffTime> filterStaffTimes(HashSet<StaffTime> staffTimes, Filter filter) {
+    HashSet<StaffTime> newStaffTimes = new HashSet<>();
+    return switch (filter) {
+      case NON_ADMINS, ADMINS -> {
+        for (StaffTime staffTime : staffTimes) {
+          if (staffTime.getFilter() == filter) {
+            newStaffTimes.add(staffTime);
+          }
+        }
+        yield newStaffTimes;
+      }
+      default -> staffTimes;
+    };
   }
 
   @Override
@@ -92,12 +104,16 @@ public class StaffTimesMenu extends InventoryGUI {
       skull.editMeta(SkullMeta.class, meta -> meta.setOwningPlayer(offlinePlayer));
       skull =
           ItemStackHelper.builder(skull)
-              .name("&e&l" + offlinePlayer.getName())
+              .name("&e&l" + getTimeColoredName(offlinePlayer.getName(), hours))
               .addLore("&7" + formattedHours + " Hours")
               .build();
       getInventory().setItem(slot, skull);
       slot++;
     }
+  }
+
+  private String getTimeColoredName(String name, double hours) {
+    return hours >= MainConfig.getInstance().getMinumumHours() ? "&2&l" + name : "&c&l" + name;
   }
 
   private LinkedHashSet<StaffTime> sortStaffTimes(Set<StaffTime> staffTimes) {
@@ -110,12 +126,14 @@ public class StaffTimesMenu extends InventoryGUI {
 
   private InventoryButton UpdateButton() {
     return new InventoryButton()
-        .creator(player -> ItemStackHelper.builder(Material.BONE_MEAL)
-                .name("&e&lUpdate Data")
-                .addLore("&7Will update the data to the current second.")
-                .addLore()
-                .addLore("&7[Click to update]")
-                .build())
+        .creator(
+            player ->
+                ItemStackHelper.builder(Material.BONE_MEAL)
+                    .name("&e&lUpdate Data")
+                    .addLore("&7Will update the data to the current second.")
+                    .addLore()
+                    .addLore("&7[Click to update]")
+                    .build())
         .consumer(
             event -> {
               Player player = (Player) event.getWhoClicked();
@@ -147,6 +165,7 @@ public class StaffTimesMenu extends InventoryGUI {
   private InventoryButton FilterButton() {
     String nonAdminsLore =
         pageData.getFilter() == Filter.NON_ADMINS ? "&f&l Non Admins" : "&7Non Admins";
+    String adminsLore = pageData.getFilter() == Filter.ADMINS ? "&f&l Admins" : "&7Admins";
     String allLore = pageData.getFilter() == Filter.ALL ? "&f&l All Staff" : "&7All Staff";
     return new InventoryButton()
         .creator(
@@ -155,6 +174,7 @@ public class StaffTimesMenu extends InventoryGUI {
                     .name("&e&lFilter")
                     .addLore("")
                     .addLore(nonAdminsLore)
+                    .addLore(adminsLore)
                     .addLore(allLore)
                     .addLore("")
                     .addLore("&7[Click to switch filter]")
@@ -190,7 +210,10 @@ public class StaffTimesMenu extends InventoryGUI {
                 new AnvilGUI.Builder()
                     .plugin(Main.getInstance())
                     .title("Search")
-                    .itemLeft(ItemStackHelper.builder(Material.PAPER).name("").build())
+                    .itemLeft(
+                        ItemStackHelper.builder(Material.PAPER)
+                            .name("")
+                            .build()) // the name might be why theres a bug
                     .onClick(
                         (slot, stateSnapshot) -> {
                           if (slot == 2) {

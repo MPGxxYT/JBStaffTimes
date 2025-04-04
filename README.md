@@ -16,6 +16,9 @@ There tabs by week. The amount of weeks is also configurable in the config.
 ## To Do
 - [X] v1.0
     - [X] Release 
-- [ ] v1.1
-    - [ ] Fix filter bug
-    - [ ] Chatting resets afk timer
+- [X] v1.0.1
+    - [X] Fix filter bug
+    - [X] Chatting resets afk timer
+    - [X] Colored name based on min times
+- [ ] v1.0.2
+  - [ ] TBD
