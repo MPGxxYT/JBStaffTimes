@@ -21,4 +21,4 @@ There tabs by week. The amount of weeks is also configurable in the config.
     - [X] Chatting resets afk timer
     - [X] Colored name based on min times
 - [ ] v1.0.2
-  - [ ] TBD
+  - [X] Fix bug with colored name [had a typo lol]
