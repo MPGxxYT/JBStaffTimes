@@ -20,5 +20,7 @@ There tabs by week. The amount of weeks is also configurable in the config.
     - [X] Fix filter bug
     - [X] Chatting resets afk timer
     - [X] Colored name based on min times
-- [ ] v1.0.2
+- [X] v1.0.2
   - [X] Fix bug with colored name [had a typo lol]
+- [ ] v1.0.3
+  - [ ] AFK Time per user + afk flagged count
