@@ -2,6 +2,7 @@ package me.mortaldev.jbstafftimes;
 
 import co.aikar.commands.PaperCommandManager;
 import me.mortaldev.jbstafftimes.commands.StaffTimesCommand;
+import me.mortaldev.jbstafftimes.commands.UTimeCommand;
 import me.mortaldev.jbstafftimes.config.MainConfig;
 import me.mortaldev.jbstafftimes.listeners.ChatListener;
 import me.mortaldev.jbstafftimes.listeners.JoinListener;
@@ -93,6 +94,7 @@ public final class Main extends JavaPlugin {
     // COMMANDS
 
     commandManager.registerCommand(new StaffTimesCommand());
+    commandManager.registerCommand(new UTimeCommand());
 
     TimerManager.getInstance().initalizeTimers();
     AfkManager.getInstance().init();
@@ -101,6 +103,7 @@ public final class Main extends JavaPlugin {
 
   @Override
   public void onDisable() {
+    AfkManager.getInstance().removeAllAfkPlayers();
     TimerManager.getInstance().stopAllTimers();
     getLogger().info(LABEL + " Disabled");
   }

@@ -13,7 +13,7 @@ import me.mortaldev.jbstafftimes.modules.afk.AfkManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandAlias("stafftimes")
+@CommandAlias("stafftimes|stimes")
 @CommandPermission("jbstafftimes.admin")
 public class StaffTimesCommand extends BaseCommand {
 

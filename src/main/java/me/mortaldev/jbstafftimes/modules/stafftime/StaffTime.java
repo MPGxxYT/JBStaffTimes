@@ -12,8 +12,10 @@ import org.bukkit.entity.Player;
 
 public class StaffTime implements CRUD.Identifiable {
   private final UUID uuid;
-  private final HashMap<String, Long> times;
+  private HashMap<String, Long> times;
   // date, time in minutes
+  private HashMap<String, Long> afkTime = new HashMap<>();
+  private HashMap<String, Long> afkFlags = new HashMap<>();
   private Filter filter;
 
   public StaffTime(UUID uuid) {
@@ -22,12 +24,75 @@ public class StaffTime implements CRUD.Identifiable {
     this.times = new HashMap<>();
   }
 
+  public HashMap<String, Long> getTimes() {
+    return times;
+  }
+
+  public void setTimes(HashMap<String, Long> times) {
+    this.times = times;
+  }
+
+  public void removeTimesDate(LocalDate date) {
+    times.remove(localDateToString(date));
+  }
+
+  public HashMap<String, Long> getAfkTime() {
+    return afkTime;
+  }
+
+  public void setAfkTime(HashMap<String, Long> afkTime) {
+    this.afkTime = afkTime;
+  }
+
+  public void removeAfkTimeDate(LocalDate date) {
+    afkTime.remove(localDateToString(date));
+  }
+
+  public HashMap<String, Long> getAfkFlags() {
+    return afkFlags;
+  }
+
+  public void setAfkFlags(HashMap<String, Long> afkFlags) {
+    this.afkFlags = afkFlags;
+  }
+
+  public void removeAfkFlagDate(LocalDate date) {
+    afkFlags.remove(localDateToString(date));
+  }
+
+  public void addAFKFlag(LocalDate date) {
+    if (afkFlags.containsKey(localDateToString(date))) {
+      long summedFlags = afkFlags.get(localDateToString(date)) + 1;
+      afkFlags.put(localDateToString(date), summedFlags);
+    } else {
+      afkFlags.put(localDateToString(date), 1L);
+    }
+  }
+
+  public Long getAfkFlagsOfWeek(LocalDate date) {
+    Long flagsTotal = wholeWeekOf(date, afkFlags);
+    if (flagsTotal == null) {
+      return 0L;
+    }
+    return flagsTotal;
+  }
+
   public void addTime(LocalDate date, long time) {
     if (times.containsKey(localDateToString(date))) {
       long summedTime = times.get(localDateToString(date)) + time;
       times.put(localDateToString(date), summedTime);
     } else {
       times.put(localDateToString(date), time);
+    }
+    StaffTimeManager.getInstance().update(this);
+  }
+
+  public void addAFKTime(LocalDate date, long time) {
+    if (afkTime.containsKey(localDateToString(date))) {
+      long summedTime = afkTime.get(localDateToString(date)) + time;
+      afkTime.put(localDateToString(date), summedTime);
+    } else {
+      afkTime.put(localDateToString(date), time);
     }
     StaffTimeManager.getInstance().update(this);
   }
@@ -51,10 +116,6 @@ public class StaffTime implements CRUD.Identifiable {
     return filter;
   }
 
-  public HashMap<String, Long> getTimes() {
-    return times;
-  }
-
   public Long getTotalTime() {
     Long totalTime = 0L;
     for (Long time : times.values()) {
@@ -63,11 +124,27 @@ public class StaffTime implements CRUD.Identifiable {
     return totalTime;
   }
 
-  public Long getTime(LocalDate date) {
-    return times.get(localDateToString(date));
+  /**
+   * Returns the total time of the week containing the given date.
+   *
+   * @param date the date
+   * @return the total time of the week in miliseconds
+   */
+  public Long getTimeOfWholeWeek(LocalDate date) {
+    return wholeWeekOf(date, times);
   }
 
-  public Long getTimeOfWholeWeek(LocalDate date) {
+  /**
+   * Returns the total AFK time of the week containing the given date.
+   *
+   * @param date the date
+   * @return the total AFK time of the week in miliseconds
+   */
+  public Long getAfkOfWholeWeek(LocalDate date) {
+    return wholeWeekOf(date, afkTime);
+  }
+
+  private Long wholeWeekOf(LocalDate date, HashMap<String, Long> times) {
     LocalDate sunday = StaffTimeManager.getInstance().getSundayOf(date);
     Long totalTime = 0L;
     for (int i = 0; i < 7; i++) {
@@ -79,11 +156,11 @@ public class StaffTime implements CRUD.Identifiable {
     return totalTime;
   }
 
-  private String localDateToString(LocalDate date) {
+  public String localDateToString(LocalDate date) {
     return date.format(DateTimeFormatter.ISO_DATE);
   }
 
-  private LocalDate localDateFromString(String dateString) {
+  public LocalDate localDateFromString(String dateString) {
     return LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE);
   }
 

@@ -96,20 +96,38 @@ public class StaffTimesMenu extends InventoryGUI {
     int slot = 9;
     LinkedHashSet<StaffTime> sortedStaffTimes = sortStaffTimes(staffTimes);
     for (StaffTime staffTime : sortedStaffTimes) {
-      Long minutes = staffTime.getTimeOfWholeWeek(adjustedDate);
-      double hours = (double) (minutes / 60000) / 60;
-      String formattedHours = String.format("%.2f", hours);
-      ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-      OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(staffTime.getID()));
-      skull.editMeta(SkullMeta.class, meta -> meta.setOwningPlayer(offlinePlayer));
-      skull =
-          ItemStackHelper.builder(skull)
-              .name("&e&l" + getTimeColoredName(offlinePlayer.getName(), hours))
-              .addLore("&7" + formattedHours + " Hours")
-              .build();
+      ItemStack skull = getHead(staffTime, adjustedDate);
       getInventory().setItem(slot, skull);
       slot++;
     }
+  }
+
+  public static LocalDate getAdjustedDate(long adjustment) {
+    LocalDate date = StaffTimeManager.getInstance().getToday().minusDays(adjustment);
+    return StaffTimeManager.getInstance().getSundayOf(date);
+  }
+
+  private ItemStack getHead(StaffTime staffTime, LocalDate adjustedDate) {
+    Long activeTimeOfWeek = staffTime.getTimeOfWholeWeek(adjustedDate);
+    Long afkTimeOfWeek = staffTime.getAfkOfWholeWeek(adjustedDate);
+    double activeHours = (double) (activeTimeOfWeek / 60000) / 60;
+    ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(staffTime.getID()));
+    skull.editMeta(SkullMeta.class, meta -> meta.setOwningPlayer(offlinePlayer));
+    return ItemStackHelper.builder(skull)
+        .name("&e&l" + getTimeColoredName(offlinePlayer.getName(), activeHours))
+        .addLore("")
+        .addLore("&3&lActive:&7 " + formattedDuration(activeTimeOfWeek) + " Hours")
+        .addLore("")
+        .addLore("&3&lAFK: ")
+        .addLore("&7 ~ " + formattedDuration(afkTimeOfWeek) + " Hours")
+        .addLore("&7 ~ " + staffTime.getAfkFlagsOfWeek(adjustedDate) + " Times Flagged")
+        .build();
+  }
+
+  public static String formattedDuration(Long time) {
+    double hours = (double) (time / 60000) / 60;
+    return String.format("%.2f", hours);
   }
 
   private String getTimeColoredName(String name, double hours) {
@@ -229,10 +247,5 @@ public class StaffTimesMenu extends InventoryGUI {
                 Main.getGuiManager().openGUI(new StaffTimesMenu(pageData), player);
               }
             });
-  }
-
-  private LocalDate getAdjustedDate(long adjustment) {
-    LocalDate date = StaffTimeManager.getInstance().getToday().minusDays(adjustment);
-    return StaffTimeManager.getInstance().getSundayOf(date);
   }
 }
