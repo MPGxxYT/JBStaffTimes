@@ -1,20 +1,22 @@
 package me.mortaldev.jbstafftimes.modules.afk;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 import me.mortaldev.jbstafftimes.Main;
 import me.mortaldev.jbstafftimes.config.MainConfig;
+import me.mortaldev.jbstafftimes.modules.stafftime.StaffTimeManager;
 import me.mortaldev.jbstafftimes.modules.timer.TimerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class AfkManager {
 
-  private final AfkTimer afkTimer = new AfkTimer();
-  // This is a list of all players that have the staff perm
+  private final AfkTimers afkTimers = new AfkTimers();
   private final HashSet<UUID> relevantPlayers = new HashSet<>();
-  private final HashSet<UUID> afkPlayers = new HashSet<>();
+  // This is a list of all players that have the staff perm
+  private final HashMap<UUID, Long> afkPlayers = new HashMap<>();
   private final HashMap<String, Integer> scheduledTasks = new HashMap<>();
 
   private AfkManager() {}
@@ -57,10 +59,15 @@ public class AfkManager {
             .scheduleSyncRepeatingTask(
                 Main.getInstance(),
                 () -> {
-                  for (UUID uuid : afkTimer.getAfkPlayers()) {
+                  for (UUID uuid : afkTimers.getAfkPlayers()) {
                     TimerManager.getInstance().stopTimer(uuid);
-                    afkTimer.stopTimer(uuid);
-                    afkPlayers.add(uuid);
+                    Long durationBeforeTrigger = afkTimers.stopTimer(uuid);
+                    afkPlayers.put(uuid, System.currentTimeMillis() - durationBeforeTrigger);
+                    StaffTimeManager.getInstance()
+                        .getByID(uuid.toString())
+                        .ifPresent(
+                            staffTime ->
+                                staffTime.addAFKFlag(StaffTimeManager.getInstance().getToday()));
                     if (Main.getDebugToggle()) {
                       Main.log("AFK: " + uuid);
                     }
@@ -78,10 +85,25 @@ public class AfkManager {
     if (Main.getDebugToggle()) {
       Main.log("AFK Reset: " + player.getUniqueId());
     }
-    afkTimer.startTimer(player.getUniqueId());
-    if (afkPlayers.contains(player.getUniqueId())) {
-      afkPlayers.remove(player.getUniqueId());
+    afkTimers.startTimer(player.getUniqueId());
+    if (afkPlayers.containsKey(player.getUniqueId())) {
+      removeAfkPlayer(player.getUniqueId());
       TimerManager.getInstance().startTimer(player);
+    }
+  }
+
+  public void removeAfkPlayer(UUID uuid) {
+    Long timestamp = afkPlayers.remove(uuid);
+    long duration = System.currentTimeMillis() - timestamp;
+    LocalDate today = StaffTimeManager.getInstance().getToday();
+    StaffTimeManager.getInstance()
+        .getByID(uuid.toString())
+        .ifPresent(staffTime -> staffTime.addAFKTime(today, duration));
+  }
+
+  public void removeAllAfkPlayers() {
+    for (UUID uuid : afkPlayers.keySet()) {
+      removeAfkPlayer(uuid);
     }
   }
 
