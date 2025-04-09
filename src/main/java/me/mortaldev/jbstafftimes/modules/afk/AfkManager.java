@@ -77,10 +77,6 @@ public class AfkManager {
                 20));
   }
 
-  public void clearAFK() {
-    afkPlayers.clear();
-  }
-
   public void resetTimer(Player player) {
     if (Main.getDebugToggle()) {
       Main.log("AFK Reset: " + player.getUniqueId());
@@ -93,6 +89,9 @@ public class AfkManager {
   }
 
   public void removeAfkPlayer(UUID uuid) {
+    if (!afkPlayers.containsKey(uuid)) {
+      return;
+    }
     Long timestamp = afkPlayers.remove(uuid);
     long duration = System.currentTimeMillis() - timestamp;
     LocalDate today = StaffTimeManager.getInstance().getToday();

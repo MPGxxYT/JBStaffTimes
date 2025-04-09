@@ -14,6 +14,7 @@ public class QuitListener implements Listener {
     TimerManager.getInstance().stopTimer(event.getPlayer().getUniqueId());
     if (event.getPlayer().hasPermission(MainConfig.getInstance().getStaffPermission())) {
       AfkManager.getInstance().removeRelevantPlayer(event.getPlayer().getUniqueId());
+      AfkManager.getInstance().removeAfkPlayer(event.getPlayer().getUniqueId());
     }
   }
 }

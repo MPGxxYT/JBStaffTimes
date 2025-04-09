@@ -15,11 +15,11 @@ that have the permission set inside `config.yml`.
 They're tabbed by week and the amount of weeks shown is configurable in the config.
 
 ## To Do
-- [X] v1.0.2
-  - [X] Fix bug with colored name [had a typo lol]
 - [X] v1.0.3
   - [X] AFK Time per user + afk flagged count
   - [X] Command to show time to user.
   - [X] Auto filtering of old data
-- [ ] v1.0.4
+- [X] v1.0.4
+  - [X] AFK Times Bug Fix
+- [ ] v1.0.5
   - [ ] TBD
