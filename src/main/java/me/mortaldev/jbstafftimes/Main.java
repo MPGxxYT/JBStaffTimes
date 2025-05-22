@@ -43,6 +43,12 @@ public final class Main extends JavaPlugin {
     Bukkit.getLogger().info("[" + Main.getLabel() + "] " + message);
   }
 
+  public static void debugLog(String message) {
+    if (debugToggle) {
+      log(message);
+    }
+  }
+
   public static void toggleDebug() {
     debugToggle = !debugToggle;
   }
@@ -80,7 +86,7 @@ public final class Main extends JavaPlugin {
     StaffTimeManager.getInstance().load();
 
     // GUI Manager
-    guiManager = new GUIManager();
+    guiManager = GUIManager.getInstance();
     GUIListener guiListener = new GUIListener(guiManager);
     Bukkit.getPluginManager().registerEvents(guiListener, this);
 
