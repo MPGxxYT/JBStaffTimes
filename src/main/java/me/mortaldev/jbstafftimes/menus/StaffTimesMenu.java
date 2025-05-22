@@ -135,10 +135,14 @@ public class StaffTimesMenu extends InventoryGUI {
   }
 
   private LinkedHashSet<StaffTime> sortStaffTimes(Set<StaffTime> staffTimes) {
-    LinkedHashSet<StaffTime> sortedStaffTimes = new LinkedHashSet<>(staffTimes);
+    long adjustment = (pageData.getWeekNumber() - 1) * 7L;
+    LocalDate adjustedDate = getAdjustedDate(adjustment);
     Stream<StaffTime> sorted =
-        sortedStaffTimes.stream()
-            .sorted(Comparator.comparingLong(StaffTime::getTotalTime).reversed());
+        staffTimes.stream()
+            .sorted(
+                Comparator.comparingLong(
+                        (StaffTime staffTime) -> staffTime.getTimeOfWholeWeek(adjustedDate))
+                    .reversed());
     return sorted.collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
